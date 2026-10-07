@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Schedule from '../components/Schedule.astro';
+import Pricing from '../components/Pricing.astro';
+import Supplements from '../components/Supplements.astro';
+import Contact from '../components/Contact.astro';
+import { site } from '../data/site';
+---
+<Layout
+  title={`${site.name} — siłownia · ${site.city}`}
+  description="Iron Gym Pisz, ul. Mazurska 14. Siłownia i cardio, strefa CrossWork, treningi personalne i zajęcia grupowe. Solarium. Honorujemy MultiSport, Medicover Sport i FitProfit. Tel. 729 407 930."
+>
+  <a href="#o-nas" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:bg-brand-accent focus:p-3 focus:text-black">Przejdź do treści</a>
+  <Header />
+  <main>
+    <Hero />
+    <About />
+    <Schedule />
+    <Pricing />
+    <Supplements />
+    <Contact />
+  </main>
+</Layout>

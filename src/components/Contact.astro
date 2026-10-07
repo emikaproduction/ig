@@ -1,0 +1,55 @@
+---
+import { site, openingHours, partnerCards } from '../data/site';
+import SectionIcon from './SectionIcon.astro';
+const dayShort = ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'];
+const hm = (t: string) => t.replace(/^0/, '');
+---
+<section id="kontakt" class="px-6 pt-24 pb-12 md:pt-30" aria-labelledby="kontakt-title">
+  <div class="mx-auto max-w-6xl">
+    <SectionIcon name="pin" data-reveal class="mb-8" />
+    <h2 id="kontakt-title" data-reveal-heading class="font-display text-[clamp(56px,11vw,168px)] leading-[0.88] uppercase">
+      <span class="text-outline">Wpadnij</span> i zacznij<br /><span class="text-brand-accent">trenować.</span>
+    </h2>
+    <div data-reveal-stagger="0.3" class="mt-12 flex flex-wrap items-center gap-4">
+      <a href={site.phoneHref} class="btn-primary px-9 py-5">Zadzwoń · {site.phone}</a>
+      <a href={site.mapsHref} target="_blank" rel="noopener" class="btn-ghost gap-3 px-9 py-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" />
+        </svg>
+        Mazurska 14 · Pisz
+      </a>
+    </div>
+    <p data-reveal="0.4" class="mt-8 max-w-2xl font-mono text-xs leading-relaxed font-bold tracking-[0.12em] text-brand-cream/70 uppercase">
+      Wejścia jednorazowe · karnety od 2 tygodni<br />
+      Honorujemy <span class="text-brand-accent">{partnerCards.join(', ')}</span>
+    </p>
+
+    <footer data-reveal-stagger class="mt-30 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8 border-t border-brand-zinc pt-8 text-sm leading-7 text-brand-muted">
+      <div>
+        <img src="/logo.jpg" alt="Iron Gym Pisz" width="96" height="96" class="mb-4 size-24 rounded-full" loading="lazy" />
+        <address class="not-italic">
+          {site.address.map((l) => <div>{l}</div>)}
+          <a href={site.phoneHref} class="mt-2 block text-zinc-400 hover:text-brand-accent">tel. {site.phone}</a>
+          <a href={`mailto:${site.email}`} class="block text-zinc-400 hover:text-brand-accent">{site.email}</a>
+        </address>
+      </div>
+      <div>
+        <p class="mb-2 font-mono text-[11px] font-extrabold tracking-[0.2em] text-white">GODZINY</p>
+        <dl class="grid grid-cols-[auto_1fr] gap-x-4 font-mono">
+          {openingHours.map((ranges, i) => (
+            <>
+              <dt class="text-zinc-300">{dayShort[i]}</dt>
+              <dd>{ranges.map((r) => `${hm(r.open)}–${hm(r.close)}`).join(' · ')}</dd>
+            </>
+          ))}
+        </dl>
+      </div>
+      <div>
+        <p class="mb-2 font-mono text-[11px] font-extrabold tracking-[0.2em] text-white">SOCIAL</p>
+        <a href={site.social.facebook} target="_blank" rel="noopener" class="block text-zinc-400 hover:text-brand-accent">Facebook</a>
+        <a href={site.social.instagram} target="_blank" rel="noopener" class="block text-zinc-400 hover:text-brand-accent">Instagram</a>
+      </div>
+    </footer>
+    <p class="mt-10 font-mono text-[11px] tracking-[0.15em] text-zinc-500">© {new Date().getFullYear()} {site.name}. Wszystkie prawa zastrzeżone.</p>
+  </div>
+</section>

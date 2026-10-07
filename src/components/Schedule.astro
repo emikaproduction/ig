@@ -1,0 +1,128 @@
+---
+import { schedule } from '../data/site';
+import SectionIcon from './SectionIcon.astro';
+---
+<section id="grafik" data-schedule class="bg-brand-raised px-6 py-24 md:py-30" aria-labelledby="grafik-title">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-12 flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <SectionIcon name="calendar" data-reveal class="mb-6" />
+        <p data-reveal class="eyebrow mb-3">02 / Grafik</p>
+        <h2 id="grafik-title" data-reveal-heading="0.1" class="font-display text-[clamp(48px,7vw,96px)] leading-[0.9] uppercase">
+          Plan <span class="text-outline">tygodnia</span>
+        </h2>
+      </div>
+      <p data-reveal="0.25" class="max-w-sm text-[15px] leading-relaxed text-brand-muted">
+        Zapisy telefonicznie lub na miejscu. Poza zajęciami siłownia jest otwarta do treningu indywidualnego.
+      </p>
+    </div>
+
+    <div data-reveal-stagger="0.2" role="tablist" aria-label="Dzień tygodnia" class="mb-6 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" data-tabs>
+      {schedule.map((day, i) => (
+        <button
+          type="button"
+          role="tab"
+          id={`tab-${i}`}
+          aria-controls={`panel-${i}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+          data-day={i}
+          class="flex min-h-16 min-w-24 shrink-0 flex-col items-center justify-center gap-0.5 rounded-sm border border-brand-line bg-brand-lift px-4 py-2 font-mono font-extrabold tracking-[0.12em] text-white transition-all hover:border-brand-accent aria-selected:border-brand-accent aria-selected:bg-brand-accent aria-selected:text-black"
+        >
+          <span class="text-base">{day.short}</span>
+          <span class="text-[10px] opacity-70" data-sub>{day.long.toUpperCase()}</span>
+        </button>
+      ))}
+    </div>
+
+    {schedule.map((day, i) => (
+      <div
+        role="tabpanel"
+        id={`panel-${i}`}
+        aria-labelledby={`tab-${i}`}
+        hidden={i !== 0}
+        data-panel={i}
+        class="flex flex-col gap-2 md:gap-0 md:border-t md:border-brand-line"
+      >
+        {day.classes.length === 0 && (
+          <p class="border border-brand-line bg-brand-lift p-6 text-[15px] text-brand-muted md:border-x-0 md:border-t-0 md:bg-transparent md:px-6">
+            Brak zajęć grupowych — siłownia otwarta do treningu indywidualnego.
+          </p>
+        )}
+        {day.classes.map((cls) => (
+          <div
+            data-time={cls.time}
+            data-minutes={cls.minutes}
+            class="group grid grid-cols-[72px_minmax(0,1fr)] items-center gap-x-5 gap-y-2 border border-l-4 border-brand-line border-l-transparent bg-brand-lift p-4 transition-all duration-300 hover:border-l-brand-accent md:grid-cols-[180px_minmax(0,1fr)_110px] md:gap-6 md:border-x-0 md:border-t-0 md:border-l-4 md:bg-transparent md:px-6 md:py-6 md:hover:bg-brand-lift data-[live]:border-l-brand-accent data-[live]:bg-brand-lift data-[live]:shadow-glow"
+          >
+            <div class="font-mono text-lg font-extrabold tracking-wider md:text-2xl">{cls.time}</div>
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-3">
+                <h3 class="font-display text-xl uppercase md:text-[26px]">{cls.name}</h3>
+                <span data-live-badge hidden class="rounded-sm bg-brand-accent px-2 py-1 font-mono text-[10px] font-extrabold tracking-[0.18em] text-brand-black">TRWA TERAZ</span>
+              </div>
+              <p class="mt-1 text-sm text-brand-muted">{cls.desc}</p>
+              <p class="mt-2 font-mono text-xs font-bold tracking-wider text-zinc-300 md:hidden">{cls.minutes} MIN</p>
+            </div>
+            <div class="hidden font-mono text-[13px] font-bold tracking-[0.1em] text-brand-muted md:block">{cls.minutes} MIN</div>
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-tabs] [role="tab"]'));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+
+  const select = (i: number, focus = false) => {
+    tabs.forEach((t, j) => {
+      const on = i === j;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    panels.forEach((p, j) => (p.hidden = i !== j));
+    if (focus) tabs[i].focus();
+    // Tylko poziomo w pasku zakładek (mobile). scrollIntoView przewijałby też całą stronę w pionie.
+    const bar = tabs[i].parentElement!.getBoundingClientRect();
+    const t = tabs[i].getBoundingClientRect();
+    if (t.left < bar.left) tabs[i].parentElement!.scrollLeft -= bar.left - t.left;
+    else if (t.right > bar.right) tabs[i].parentElement!.scrollLeft += t.right - bar.right;
+  };
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i));
+    t.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') select((i + 1) % tabs.length, true);
+      if (e.key === 'ArrowLeft') select((i - 1 + tabs.length) % tabs.length, true);
+    });
+  });
+
+  // Dzisiejszy dzień + zajęcia, które właśnie trwają (czas Europe/Warsaw)
+  const fmt = new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+  const dayNames = ['pon.', 'wt.', 'śr.', 'czw.', 'pt.', 'sob.', 'niedz.'];
+  const toMin = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  const markLive = () => {
+    const parts = Object.fromEntries(fmt.formatToParts(new Date()).map((p) => [p.type, p.value]));
+    const today = Math.max(0, dayNames.indexOf(parts.weekday));
+    const now = Number(parts.hour) * 60 + Number(parts.minute);
+    tabs[today]?.querySelector('[data-sub]')?.replaceChildren('DZIŚ');
+    panels.forEach((panel, d) => {
+      panel.querySelectorAll<HTMLElement>('[data-time]').forEach((row) => {
+        const start = toMin(row.dataset.time!);
+        const live = d === today && now >= start && now < start + Number(row.dataset.minutes);
+        row.toggleAttribute('data-live', live);
+        row.querySelector<HTMLElement>('[data-live-badge]')!.hidden = !live;
+      });
+    });
+    return today;
+  };
+
+  select(markLive());
+  setInterval(markLive, 60_000);
+</script>

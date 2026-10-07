@@ -1,0 +1,57 @@
+---
+// Ikony sekcji w jednym stylu: kontur 2px w złocie, proste geometryczne kształty, wysokość 80px.
+type Name = 'kettlebell' | 'calendar' | 'ticket' | 'shaker' | 'pin';
+interface Props {
+  name: Name;
+  class?: string;
+  [key: string]: unknown;
+}
+const { name, class: className = '', ...rest } = Astro.props;
+const width = { kettlebell: 64, calendar: 64, ticket: 64, shaker: 56, pin: 56 }[name];
+---
+<svg
+  width={width}
+  height="80"
+  viewBox={`0 0 ${width} 80`}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  class:list={['text-brand-accent', className]}
+  aria-hidden="true"
+  {...rest}
+>
+  {name === 'kettlebell' && (
+    <>
+      <path d="M20 36 17 6h30l-3 30" />
+      <path d="M27 31 25 14h14l-2 17" />
+      <path d="M9 56a23 23 0 0 1 46 0c0 8-3 15-7 20H16c-4-5-7-12-7-20z" />
+      <path d="M20 60h24" />
+    </>
+  )}
+  {name === 'calendar' && (
+    <>
+      <path d="M4 16h56v60H4z" /><path d="M4 32h56" /><path d="M18 8v14" /><path d="M46 8v14" />
+      <path d="M14 46h8" /><path d="M28 46h8" /><path d="M42 46h8" /><path d="M14 62h8" /><path d="M28 62h8" />
+      <path d="M42 57h8v10h-8z" />
+    </>
+  )}
+  {name === 'ticket' && (
+    <>
+      <path d="M8 4h48v26a6 6 0 0 0 0 12v34H8V42a6 6 0 0 0 0-12z" />
+      <path d="M16 36h32" stroke-dasharray="3 4" />
+      <path d="M18 16h28" /><path d="M18 54h28" /><path d="M18 64h16" />
+    </>
+  )}
+  {name === 'shaker' && (
+    <>
+      <path d="M18 2h20v8H18z" /><path d="M14 10h28l-2 10H16z" /><path d="M16 20h24l-3 56H19z" /><path d="M17 40h22" /><path d="M18 56h20" />
+    </>
+  )}
+  {name === 'pin' && (
+    <>
+      <path d="M28 74S4 48 4 28a24 24 0 0 1 48 0c0 20-24 46-24 46z" />
+      <path d="M19 28a9 9 0 1 0 18 0 9 9 0 1 0-18 0" />
+      <path d="M14 78h28" />
+    </>
+  )}
+</svg>

@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/*
+ * Paleta brand ze specyfikacji (odpowiednik tailwind.config.cjs w Tailwind v4).
+ * Daje klasy: bg-brand-black, bg-brand-dark, border-brand-zinc, text-brand-accent, text-brand-muted…
+ */
+@theme {
+  --color-brand-black: #070708;
+  --color-brand-dark: #0e0e10;
+  /* Jaśniejsze sekcje (Grafik, Suplementy): tło, karty o krok jaśniejsze, widoczne obramowania */
+  --color-brand-raised: #131315;
+  --color-brand-lift: #1b1b1e;
+  --color-brand-line: #27272a;
+  --color-brand-zinc: #18181b;
+  --color-brand-accent: #ddb145;
+  --color-brand-accent-hover: #c49a35;
+  /* Spec: #71717a ma 4.2:1 na czerni (< WCAG AA). Rozjaśnione do 6.0:1. */
+  --color-brand-muted: #8b8b94;
+  /* Ciepła złamana biel do tekstów na zdjęciach – lepiej gra ze złotem niż chłodna szarość */
+  --color-brand-cream: #ece6d8;
+
+  --font-display: "Oswald", Impact, "Arial Narrow", sans-serif;
+  /* Anton (pierwotny wybór) ma uszkodzone glify Ś/Ć — Oswald poprawnie renderuje polskie znaki. */
+  --font-sans: "Archivo", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --shadow-glow: 0 0 20px rgba(221, 177, 69, 0.15);
+  --shadow-glow-strong: 0 0 25px rgba(221, 177, 69, 0.3);
+}
+
+@layer base {
+  html { @apply bg-brand-black scroll-smooth; color-scheme: dark; }
+  body { @apply bg-brand-black text-white font-sans antialiased; }
+  ::selection { @apply bg-brand-accent text-black; }
+  :focus-visible { outline: 2px solid var(--color-brand-accent); outline-offset: 3px; }
+}
+
+@layer components {
+  /* Magnezja / ziarno filmu — filtr SVG, zero grafik rastrowych */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* Tekst z samym obrysem */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px #fff;
+  }
+
+  /* Gradient „rozgrzanej stali” */
+
+
+  .font-display { font-weight: 700; letter-spacing: -0.01em; }
+
+  .eyebrow {
+    @apply font-mono text-xs font-bold tracking-[0.3em] text-brand-accent uppercase;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-11 items-center justify-center rounded-sm bg-brand-accent px-8 py-4 text-sm font-extrabold tracking-[0.14em] text-brand-black uppercase shadow-glow transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-accent-hover hover:shadow-glow-strong;
+  }
+
+  .btn-ghost {
+    @apply inline-flex min-h-11 items-center justify-center rounded-sm border border-zinc-700 px-8 py-4 text-sm font-bold tracking-[0.14em] text-white uppercase transition-all duration-300 hover:border-brand-accent hover:text-brand-accent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* Stan startowy animacji (Motion, src/scripts/motion.ts). Tylko z klasą .motion na <html>. */
+html.motion :is([data-header], [data-hero-media], [data-hero], [data-hero-line], [data-reveal], [data-reveal-heading], [data-reveal-image]),
+html.motion [data-hero="tags"] > *,
+html.motion [data-reveal-stagger] > *,
+html.motion [data-panel] > * {
+  opacity: 0;
+}
+html.motion [data-hero="tags"] {
+  opacity: 1;
+}

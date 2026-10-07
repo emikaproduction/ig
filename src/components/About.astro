@@ -1,0 +1,124 @@
+---
+import { site, zones, perks, googleRating, partnerCards } from '../data/site';
+import SectionIcon from './SectionIcon.astro';
+---
+<section id="o-nas" class="px-6 py-24 md:py-30" aria-labelledby="o-nas-title">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-14 grid gap-8 md:grid-cols-[1fr_minmax(0,26rem)] md:items-end">
+      <div>
+        <SectionIcon name="kettlebell" data-reveal class="mb-6" />
+        <p data-reveal class="eyebrow mb-3">01 / O nas</p>
+        <h2 id="o-nas-title" data-reveal-heading="0.1" class="font-display text-[clamp(48px,7vw,96px)] leading-[0.9] uppercase">
+          Trenuj <span class="text-outline block">po swojemu</span>
+        </h2>
+      </div>
+      <p data-reveal="0.25" class="text-[15px] leading-relaxed text-brand-cream/80">
+        {site.name} to siłownia przy ul. Mazurskiej 14 w Piszu. Pełna strefa siłowa i cardio, osobna
+        przestrzeń do CrossWork, treningi personalne i zajęcia w grupie — wybierz, jak chcesz trenować.
+      </p>
+    </div>
+
+    <!-- Strefy i oferta -->
+    <!-- Linie między kartami to tło siatki widoczne w 1px szczelinach (p-px = też obramowanie z zewnątrz),
+         dzięki temu złota poświata pod kursorem rozświetla krawędzie. -->
+    <ul data-reveal-stagger data-glow class="glow-grid grid gap-px bg-brand-zinc p-px sm:grid-cols-2 lg:grid-cols-5">
+      {zones.map((z) => (
+        <li class="glow-card group flex flex-col gap-4 bg-brand-black p-6 transition-colors hover:bg-brand-dark sm:last:col-span-2 lg:last:col-span-1">
+          <h3 class="font-display text-2xl leading-tight uppercase transition-colors group-hover:text-brand-accent">{z.name}</h3>
+          <p class="text-sm leading-relaxed text-brand-cream/65">{z.desc}</p>
+        </li>
+      ))}
+    </ul>
+
+    <!-- Wyróżniki -->
+    <div data-reveal-stagger class="mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+      {perks.map((p, i) => (
+        <div class="border-t-2 border-brand-accent pt-5">
+          <h3 class="font-display text-[28px] uppercase">{p.name}</h3>
+          <p class="mt-2 text-[15px] leading-relaxed text-brand-cream/70">{p.desc}</p>
+          {i === 0 && (
+            <p class="mt-4 font-mono text-xs font-bold tracking-[0.14em] text-brand-accent uppercase">
+              ★ {googleRating.score} / 5 · {googleRating.count} opinii w Google
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <!-- Karty partnerskie -->
+    <div data-reveal class="mt-16 flex flex-col gap-5 border border-brand-zinc bg-brand-dark p-6 md:flex-row md:items-center md:justify-between md:px-8">
+      <p class="font-display text-xl uppercase md:text-2xl">Honorujemy karty sportowe</p>
+      <ul class="flex flex-wrap gap-2" aria-label="Karty partnerskie">
+        {partnerCards.map((card) => (
+          <li class="inline-flex min-h-10 items-center border border-brand-accent/45 px-4 font-mono text-xs font-extrabold tracking-[0.14em] text-brand-accent uppercase">
+            {card}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Złota poświata podążająca za kursorem: krawędzie (tło siatki) + wnętrze karty */
+  .glow-grid {
+    background-image: radial-gradient(
+      280px circle at var(--gx, -999px) var(--gy, -999px),
+      rgb(221 177 69 / 0.7),
+      transparent 70%
+    );
+  }
+  .glow-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .glow-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      260px circle at var(--x, 50%) var(--y, 50%),
+      rgb(221 177 69 / 0.13),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .glow-card:hover::before {
+    opacity: 1;
+  }
+  .glow-card > * {
+    position: relative;
+  }
+</style>
+
+<script>
+  // Pozycja kursora -> zmienne CSS dla siatki (krawędzie) i każdej karty (wnętrze)
+  document.querySelectorAll<HTMLElement>('[data-glow]').forEach((grid) => {
+    const cards = Array.from(grid.children) as HTMLElement[];
+    let frame = 0;
+    let px = 0;
+    let py = 0;
+    const apply = () => {
+      frame = 0;
+      const g = grid.getBoundingClientRect();
+      grid.style.setProperty('--gx', `${px - g.left}px`);
+      grid.style.setProperty('--gy', `${py - g.top}px`);
+      for (const card of cards) {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--x', `${px - r.left}px`);
+        card.style.setProperty('--y', `${py - r.top}px`);
+      }
+    };
+    grid.addEventListener('pointermove', (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      if (!frame) frame = requestAnimationFrame(apply);
+    });
+    grid.addEventListener('pointerleave', () => {
+      grid.style.removeProperty('--gx');
+      grid.style.removeProperty('--gy');
+    });
+  });
+</script>

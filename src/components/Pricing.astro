@@ -1,0 +1,74 @@
+---
+import { pricing, type Price } from '../data/site';
+import SectionIcon from './SectionIcon.astro';
+const zl = (n: number) => `${n % 1 ? n.toFixed(2).replace('.', ',') : n} zł`;
+const groups: { title: string; items: Price[] }[] = [
+  { title: 'Karnety', items: pricing.passes },
+  { title: 'Zajęcia grupowe', items: pricing.classes },
+];
+---
+<section id="cennik" class="px-6 py-24 md:py-30" aria-labelledby="cennik-title">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-12 flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <SectionIcon name="ticket" data-reveal class="mb-6" />
+        <p data-reveal class="eyebrow mb-3">03 / Cennik</p>
+        <h2 id="cennik-title" data-reveal-heading="0.1" class="font-display text-[clamp(48px,7vw,96px)] leading-[0.9] uppercase">
+          Karnety <span class="text-outline">i ceny</span>
+        </h2>
+      </div>
+      <p data-reveal="0.25" class="max-w-sm text-[15px] leading-relaxed text-brand-cream/70">
+        Karnet, wejście jednorazowe albo zajęcia w grupie — wybierz, co Ci pasuje.
+      </p>
+    </div>
+
+    <!-- Wyróżniona oferta -->
+    <div data-reveal class="mb-14 grid border border-brand-accent sm:grid-cols-[1fr_auto]">
+      <div class="flex flex-col justify-center gap-2 p-6 md:px-8">
+        <span class="font-mono text-[11px] font-extrabold tracking-[0.2em] text-brand-accent uppercase">Najlepszy wybór</span>
+        <h3 class="font-display text-[clamp(28px,4vw,44px)] leading-none uppercase">{pricing.featured.name}</h3>
+        <p class="text-sm text-brand-cream/70">{pricing.featured.note}</p>
+      </div>
+      <div class="flex items-center justify-center bg-brand-accent px-10 py-6 font-display text-[clamp(40px,5vw,64px)] leading-none text-brand-black">
+        {zl(pricing.featured.price)}
+      </div>
+    </div>
+
+    <div class="grid gap-14 md:grid-cols-2 md:gap-16">
+      {groups.map((g, gi) => (
+        <div>
+          <h3 data-reveal class="mb-2 font-mono text-xs font-extrabold tracking-[0.2em] text-white uppercase">{g.title}</h3>
+          <ul data-reveal-stagger class="border-t border-brand-zinc">
+            {g.items.map((p) => (
+              <li class="flex items-center justify-between gap-6 border-b border-brand-zinc py-5">
+                <div>
+                  <p class="font-display text-[22px] leading-tight uppercase">{p.name}</p>
+                  {p.note && <p class="mt-1 text-sm text-brand-cream/60">{p.note}</p>}
+                </div>
+                <div class="shrink-0 text-right">
+                  <p class="font-display text-[28px] leading-none text-brand-accent">
+                    {zl(p.price)}{p.per && <span class="font-mono text-xs font-bold tracking-[0.1em] text-brand-cream/70"> / {p.per}</span>}
+                  </p>
+                  {p.reduced && <p class="mt-1.5 font-mono text-xs font-bold tracking-[0.1em] text-brand-cream/70">ulg. {zl(p.reduced)}*</p>}
+                </div>
+              </li>
+            ))}
+            {gi === 1 &&
+              pricing.extras.map((p) => (
+                <li class="mt-6 flex items-center justify-between gap-6 border-t border-b border-brand-zinc py-5">
+                  <p class="font-display text-[22px] leading-tight uppercase">{p.name}</p>
+                  <p class="shrink-0 font-display text-[28px] leading-none text-brand-accent">
+                    {zl(p.price)} <span class="font-mono text-xs font-bold tracking-[0.1em] text-brand-cream/70">/ {p.per}</span>
+                  </p>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <p data-reveal class="mt-10 max-w-3xl font-mono text-xs leading-relaxed tracking-[0.06em] text-brand-muted">
+      * {pricing.reducedInfo}
+    </p>
+  </div>
+</section>

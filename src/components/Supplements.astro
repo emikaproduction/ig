@@ -1,0 +1,56 @@
+---
+import { Image } from 'astro:assets';
+import SectionIcon from './SectionIcon.astro';
+import sklep from '../assets/sklep.jpg';
+---
+<section id="suple" class="bg-brand-raised px-6 py-24 md:py-30" aria-labelledby="suple-title">
+  <div class="mx-auto grid max-w-6xl grid-cols-1 border border-brand-line md:grid-cols-[3fr_2fr]">
+    <div data-reveal-image data-parallax-frame class="relative min-h-[300px] overflow-hidden md:min-h-[520px]">
+      <!-- Zdjęcie jest o 24% wyższe niż ramka (12% zapasu góra/dół) – przy przewijaniu przesuwa się wolniej niż strona -->
+      <Image
+        src={sklep}
+        widths={[700, 1200]}
+        sizes="(min-width: 768px) 60vw, 100vw"
+        format="webp"
+        quality={78}
+        alt="Półka z odżywkami na recepcji: białko, kreatyna i witaminy"
+        data-parallax-img
+        class="absolute inset-x-0 -top-[12%] h-[124%] w-full object-cover saturate-75 will-change-[translate]"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-black/50 to-transparent md:bg-gradient-to-l md:from-brand-lift/60" aria-hidden="true"></div>
+    </div>
+    <div data-reveal-stagger="0.3" class="flex flex-col justify-center gap-6 border-t border-brand-line bg-brand-lift px-8 py-14 md:border-t-0 md:border-l md:px-12">
+      <SectionIcon name="shaker" />
+      <p class="eyebrow">04 / Suplementacja</p>
+      <h2 id="suple-title" class="font-display text-[clamp(40px,5vw,64px)] leading-[0.92] uppercase">
+        Paliwo czeka <span class="text-outline">na recepcji</span>
+      </h2>
+      <p class="leading-relaxed text-zinc-400">
+        Odżywki, suplementy diety, akcesoria treningowe i napoje — wszystko kupisz na miejscu. Nie wiesz, co
+        wybrać? Nasz personel doradzi, jakie suplementy sprawdzą się przy Twoim celu i rodzaju treningu.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Paralaksa zdjęcia w ramce: przesunięcie zależy od położenia ramki na ekranie (od -12% do +12% jej wysokości)
+  const frame = document.querySelector<HTMLElement>('[data-parallax-frame]');
+  const img = frame?.querySelector<HTMLElement>('[data-parallax-img]');
+  if (frame && img && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let ticking = false;
+    const apply = () => {
+      ticking = false;
+      const r = frame.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      // -1 gdy ramka wchodzi od dołu ekranu, 1 gdy wychodzi górą
+      const p = Math.max(-1, Math.min(1, (innerHeight / 2 - (r.top + r.height / 2)) / (innerHeight / 2 + r.height / 2)));
+      img.style.translate = `0 ${p * r.height * 0.12}px`;
+    };
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }, { passive: true });
+    addEventListener('resize', apply);
+    apply();
+  }
+</script>

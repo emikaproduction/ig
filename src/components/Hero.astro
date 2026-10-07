@@ -1,0 +1,218 @@
+---
+import { Image } from 'astro:assets';
+import { site, schedule } from '../data/site';
+import heroBg from '../assets/hero/hero-bg.png';
+import heroFg from '../assets/hero/hero-fg.png';
+import heroRack from '../assets/hero/hero-rack.png';
+const layer = { widths: [800, 1376], sizes: '100vw', format: 'webp' as const, alt: '' };
+// Etykiety pod hasłem: trening indywidualny + wszystkie rodzaje zajęć z grafiku (bez powtórzeń)
+const offer = ['Trening indywidualny', ...new Set(schedule.flatMap((d) => d.classes.map((c) => c.name)))];
+---
+<section id="top" class="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-0 pt-28 pb-20">
+  <!--
+    TODO: wideo hero. Wrzuć plik do public/video/hero.mp4 (+ poster) i odkomentuj.
+    <video class="absolute inset-0 h-full w-full object-cover contrast-125 grayscale opacity-30"
+      src="/video/hero.mp4" poster="/video/hero.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+  -->
+  <!-- Zdjęcie hero w 3 warstwach (paralaksa) + migająca świetlówka.
+       .hero-stage odtwarza object-cover (pozycja 50% 20%), więc wszystkie warstwy
+       trzymają się swojego miejsca na zdjęciu przy każdym rozmiarze ekranu.
+       - hero-bg:   sala bez postaci (wypełnione tło)
+       - hero-fg:   zawodnik ze sztangą, przesuwa się szybciej niż tło
+       - hero-rack: przednie słupki klatki, jadą z tłem i zasłaniają talerze -->
+  <div class="hero-media" data-hero-media aria-hidden="true">
+    <div class="hero-stage" data-parallax>
+      <Image src={heroBg} {...layer} quality={78} loading="eager" fetchpriority="high" class="para-bg absolute inset-0 h-full w-full saturate-50 contrast-110" />
+      <span class="para-bg lamp lamp-tube"></span>
+      <span class="para-bg lamp lamp-glow"></span>
+      <Image src={heroFg} {...layer} quality={82} loading="eager" fetchpriority="high" class="para-fg absolute inset-0 h-full w-full saturate-50 contrast-110" />
+      <Image src={heroRack} {...layer} quality={80} loading="eager" class="para-bg absolute inset-0 h-full w-full saturate-50 contrast-110" />
+      <span class="lamp lamp-room"></span>
+    </div>
+  </div>
+  <div class="absolute inset-0 bg-brand-black/40" aria-hidden="true"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(ellipse_60%_55%_at_50%_55%,rgb(7_7_8/.6),transparent_80%)]" aria-hidden="true"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-brand-black/50 via-transparent to-brand-black" aria-hidden="true"></div>
+
+  <div class="relative max-w-6xl px-6 text-center">
+    <p data-hero="eyebrow" class="eyebrow mb-6">Siłownia · {site.city}<span class="hidden sm:inline"> · {site.address[0]}</span></p>
+    <h1 class="font-display text-[clamp(64px,14vw,200px)] leading-[0.92] tracking-tight uppercase">
+      <!-- Układ jak w logo: małe, rozstrzelone „nigdy się” nad dużym hasłem w złotym konturze
+           (ciemne półprzezroczyste wypełnienie odcina kontur od jasnych partii zdjęcia).
+           pl-[0.45em] równoważy odstęp po ostatniej literze, żeby tekst był na środku. -->
+      <span data-hero-line class="mb-[0.15em] block pl-[0.45em] text-[0.32em] tracking-[0.45em] text-white">Nigdy się</span>
+      <span data-hero-line class="block text-brand-black/55 [-webkit-text-stroke:2px_var(--color-brand-accent)]">nie poddawaj</span>
+    </h1>
+    <div class="mx-auto mt-8 max-w-2xl">
+      <p data-hero="text" class="font-display text-[clamp(20px,2.1vw,26px)] leading-tight tracking-[0.04em] text-balance text-brand-cream uppercase">
+        Dla każdego — bez względu na wiek i staż.
+      </p>
+      <ul data-hero="tags" class="mt-5 flex flex-wrap justify-center gap-2" aria-label="Oferta">
+        {offer.map((name) => (
+          <li>
+            <a
+              href="#grafik"
+              class="inline-flex min-h-10 items-center border border-brand-accent/45 bg-brand-black/55 px-3 font-mono text-[11px] font-extrabold tracking-[0.16em] text-brand-accent uppercase transition-colors hover:border-brand-accent hover:bg-brand-accent hover:text-brand-black"
+            >
+              {name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Strzałka w dół do następnej sekcji -->
+  <a
+    href="#o-nas"
+    data-hero="scroll"
+    aria-label="Przewiń do sekcji O nas"
+    class="absolute inset-x-0 bottom-6 z-10 mx-auto flex size-12 items-center justify-center rounded-full border border-brand-accent/50 text-brand-accent transition-colors hover:border-brand-accent hover:bg-brand-accent hover:text-brand-black md:bottom-10"
+  >
+    <svg class="scroll-cue" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true">
+      <path d="M12 4v15" /><path d="m5 12 7 7 7-7" />
+    </svg>
+  </a>
+</section>
+
+<script>
+  // Paralaksa: tło jedzie wolniej niż strona, zawodnik jeszcze wolniej -> wychodzi „przed” tło
+  const stage = document.querySelector<HTMLElement>('[data-parallax]');
+  if (stage && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const hero = stage.closest('section')!;
+    let ticking = false;
+    const apply = () => {
+      ticking = false;
+      const y = Math.min(Math.max(scrollY, 0), hero.offsetHeight);
+      stage.style.setProperty('--bg-y', `${y * 0.3}px`);
+      stage.style.setProperty('--fg-y', `${y * 0.12}px`);
+    };
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }, { passive: true });
+    apply();
+  }
+</script>
+
+<style>
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+  }
+  /* Proporcje zdjęcia 1376×768 */
+  .hero-stage {
+    --h: max(100cqh, calc(100cqw * 768 / 1376));
+    position: absolute;
+    left: 50%;
+    top: calc((100cqh - var(--h)) * 0.2);
+    width: max(100cqw, calc(100cqh * 1376 / 768));
+    height: var(--h);
+    translate: -50% 0;
+    /* Powolny „oddech” całej sceny (wszystkie warstwy razem, więc nic się nie rozjeżdża) */
+    transform-origin: 50% 35%;
+    animation-name: hero-breathe;
+    animation-duration: 20s;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-delay: 1.5s;
+  }
+  @keyframes hero-breathe {
+    from { scale: 1; }
+    to { scale: 1.05; }
+  }
+  .para-bg {
+    translate: 0 var(--bg-y, 0px);
+    will-change: translate;
+  }
+  /* Ucięte u dołu kadru nogi chowamy w przejściu do czerni */
+  .para-fg {
+    translate: 0 var(--fg-y, 0px);
+    will-change: translate;
+    mask-image: linear-gradient(to bottom, #000 80%, transparent 97%);
+  }
+  .lamp {
+    position: absolute;
+    pointer-events: none;
+    animation-duration: 7s;
+    animation-timing-function: steps(1, end);
+    animation-iteration-count: infinite;
+  }
+  /* Zgaszona rura: przykrywa jasny pasek na zdjęciu */
+  .lamp-tube {
+    left: 33.4%;
+    top: 11.2%;
+    width: 10.8%;
+    height: 3%;
+    border-radius: 999px;
+    background: #2a2a2d;
+    filter: blur(2px);
+    opacity: 0;
+    animation-name: lamp-tube;
+  }
+  /* Poświata wokół rury */
+  .lamp-glow {
+    left: 23%;
+    top: 2%;
+    width: 31%;
+    height: 22%;
+    background: radial-gradient(ellipse at center, rgb(255 250 235 / 0.35), rgb(255 250 235 / 0.08) 45%, transparent 70%);
+    mix-blend-mode: screen;
+    animation-name: lamp-glow;
+  }
+  /* Cała sala lekko ciemnieje, gdy lampa gaśnie */
+  .lamp-room {
+    inset: 0;
+    background: rgb(0 0 0 / 0.3);
+    opacity: 0;
+    animation-name: lamp-room;
+  }
+
+  @keyframes lamp-tube {
+    0%, 58% { opacity: 0; }
+    59% { opacity: 0.9; }
+    60% { opacity: 0; }
+    61.5% { opacity: 0.9; }
+    62.5% { opacity: 0.3; }
+    63.5% { opacity: 0.9; }
+    67% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  @keyframes lamp-glow {
+    0%, 58% { opacity: 1; }
+    59% { opacity: 0; }
+    60% { opacity: 1; }
+    61.5% { opacity: 0; }
+    62.5% { opacity: 0.6; }
+    63.5% { opacity: 0; }
+    67% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+  @keyframes lamp-room {
+    0%, 58% { opacity: 0; }
+    59% { opacity: 1; }
+    60% { opacity: 0; }
+    61.5% { opacity: 1; }
+    62.5% { opacity: 0.4; }
+    63.5% { opacity: 1; }
+    67% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  /* Delikatne „pukanie” strzałki w dół */
+  .scroll-cue {
+    animation: scroll-cue 2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  }
+  @keyframes scroll-cue {
+    0%, 100% { transform: translateY(-2px); }
+    50% { transform: translateY(4px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lamp,
+    .scroll-cue,
+    .hero-stage { animation: none; }
+  }
+</style>
