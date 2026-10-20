@@ -7,12 +7,13 @@ import heroRack from '../assets/hero/hero-rack.png';
 const layer = { widths: [800, 1376], sizes: '100vw', format: 'webp' as const, alt: '' };
 // Etykiety pod hasłem: trening indywidualny + wszystkie rodzaje zajęć z grafiku (bez powtórzeń)
 const offer = ['Trening indywidualny', ...new Set(schedule.flatMap((d) => d.classes.map((c) => c.name)))];
+const base = import.meta.env.BASE_URL;
 ---
 <section id="top" class="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-0 pt-28 pb-20">
   <!--
     TODO: wideo hero. Wrzuć plik do public/video/hero.mp4 (+ poster) i odkomentuj.
     <video class="absolute inset-0 h-full w-full object-cover contrast-125 grayscale opacity-30"
-      src="/video/hero.mp4" poster="/video/hero.jpg" autoplay muted loop playsinline aria-hidden="true"></video>
+      src={`${base}video/hero.mp4`} poster={`${base}video/hero.jpg`} autoplay muted loop playsinline aria-hidden="true"></video>
   -->
   <!-- Zdjęcie hero w 3 warstwach (paralaksa) + migająca świetlówka.
        .hero-stage odtwarza object-cover (pozycja 50% 20%), więc wszystkie warstwy

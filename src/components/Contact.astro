@@ -3,6 +3,7 @@ import { site, openingHours, partnerCards } from '../data/site';
 import SectionIcon from './SectionIcon.astro';
 const dayShort = ['PN', 'WT', 'ŚR', 'CZ', 'PT', 'SB', 'ND'];
 const hm = (t: string) => t.replace(/^0/, '');
+const base = import.meta.env.BASE_URL;
 ---
 <section id="kontakt" class="px-6 pt-24 pb-12 md:pt-30" aria-labelledby="kontakt-title">
   <div class="mx-auto max-w-6xl">
@@ -26,7 +27,7 @@ const hm = (t: string) => t.replace(/^0/, '');
 
     <footer data-reveal-stagger class="mt-30 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8 border-t border-brand-zinc pt-8 text-sm leading-7 text-brand-muted">
       <div>
-        <img src="/logo.jpg" alt="Iron Gym Pisz" width="96" height="96" class="mb-4 size-24 rounded-full" loading="lazy" />
+        <img src={`${base}logo.jpg`} alt="Iron Gym Pisz" width="96" height="96" class="mb-4 size-24 rounded-full" loading="lazy" />
         <address class="not-italic">
           {site.address.map((l) => <div>{l}</div>)}
           <a href={site.phoneHref} class="mt-2 block text-zinc-400 hover:text-brand-accent">tel. {site.phone}</a>

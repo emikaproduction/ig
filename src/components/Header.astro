@@ -7,6 +7,7 @@ const links = [
   { href: '#suple', label: 'Suplementy' },
   { href: '#kontakt', label: 'Kontakt' },
 ];
+const base = import.meta.env.BASE_URL;
 ---
 <!-- Na samej górze przezroczysty; po zjechaniu w dół płynnie dostaje tło, ramkę i rozmycie -->
 <header
@@ -15,7 +16,7 @@ const links = [
 >
   <div class="mx-auto flex h-18 max-w-[1360px] items-center justify-between gap-6 px-6">
     <a href="#top" class="shrink-0">
-      <img src="/logo.jpg" srcset="/logo.jpg 1x, /logo-400.jpg 2x" alt="Iron Gym Pisz" width="56" height="56" class="size-14 rounded-full" />
+      <img src={`${base}logo.jpg`} srcset={`${base}logo.jpg 1x, ${base}logo-400.jpg 2x`} alt="Iron Gym Pisz" width="56" height="56" class="size-14 rounded-full" />
     </a>
     <nav aria-label="Główna" class="hidden gap-9 text-[13px] font-semibold tracking-[0.14em] uppercase md:flex">
       {links.map((l) => (
